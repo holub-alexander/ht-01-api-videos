@@ -45,7 +45,7 @@ app.post('/videos', (req: Request, res: Response) => {
   };
 
   if (!req.body.title || !req.body.title.trim('')) {
-    res.sendStatus(400).json({
+    res.status(400).send({
       errorsMessages: [
         {
           message: 'Title is required',
@@ -58,7 +58,7 @@ app.post('/videos', (req: Request, res: Response) => {
   }
 
   if (req.body.title.length > 40) {
-    res.sendStatus(400).json({
+    res.status(400).send({
       errorsMessages: [
         {
           message: 'Title should be less then 40 symbols',
@@ -78,7 +78,7 @@ app.put('/videos/:id', (req: Request, res: Response) => {
   const video = videos.find((v) => v.id.toString() === req.params.id);
 
   if (!req.body.title || !req.body.title.trim('')) {
-    res.sendStatus(400).json({
+    res.status(400).send({
       errorsMessages: [
         {
           message: 'Title is required',
@@ -91,7 +91,7 @@ app.put('/videos/:id', (req: Request, res: Response) => {
   }
 
   if (req.body.title.length > 40) {
-    res.sendStatus(400).json({
+    res.status(400).send({
       errorsMessages: [
         {
           message: 'Title should be less then 40 symbols',
