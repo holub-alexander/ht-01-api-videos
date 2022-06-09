@@ -52,7 +52,6 @@ app.post('/videos', (req: Request, res: Response) => {
           field: 'title',
         },
       ],
-      resultCode: 1,
     });
 
     return;
@@ -66,7 +65,6 @@ app.post('/videos', (req: Request, res: Response) => {
           field: 'title',
         },
       ],
-      resultCode: 1,
     });
 
     return;
@@ -87,7 +85,6 @@ app.put('/videos/:id', (req: Request, res: Response) => {
           field: 'title',
         },
       ],
-      resultCode: 1,
     });
 
     return;
@@ -101,7 +98,6 @@ app.put('/videos/:id', (req: Request, res: Response) => {
           field: 'title',
         },
       ],
-      resultCode: 1,
     });
 
     return;
