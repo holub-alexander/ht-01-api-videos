@@ -45,21 +45,7 @@ app.post('/videos', (req: Request, res: Response) => {
   };
 
   videos.push(newVideo);
-  res.send(newVideo);
-});
-
-app.delete('/videos/:id', (req: Request, res: Response) => {
-  const index = videos.findIndex((v) => v.id.toString() === req.params.id);
-
-  if (index > 0) {
-    const newVideos = videos.filter((_, i) => index !== i);
-
-    console.log(newVideos);
-
-    res.send(newVideos);
-  } else {
-    res.sendStatus(404);
-  }
+  res.status(201).send(newVideo);
 });
 
 app.put('/videos/:id', (req: Request, res: Response) => {
@@ -96,7 +82,21 @@ app.put('/videos/:id', (req: Request, res: Response) => {
   if (video) {
     video.title = req.body.title;
 
-    res.send(videos);
+    res.status(204).send(videos);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
+app.delete('/videos/:id', (req: Request, res: Response) => {
+  const index = videos.findIndex((v) => v.id.toString() === req.params.id);
+
+  if (index > 0) {
+    const newVideos = videos.filter((_, i) => index !== i);
+
+    console.log(newVideos);
+
+    res.status(204).send(newVideos);
   } else {
     res.sendStatus(404);
   }
