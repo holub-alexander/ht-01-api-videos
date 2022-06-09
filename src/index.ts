@@ -44,6 +44,20 @@ app.post('/videos', (req: Request, res: Response) => {
     author: 'it-incubator.eu',
   };
 
+  if (!req.body.title || !req.body.title.trim('')) {
+    res.sendStatus(400).json({
+      errorsMessages: [
+        {
+          message: 'Title is required',
+          field: 'title',
+        },
+      ],
+      resultCode: 1,
+    });
+
+    return;
+  }
+
   videos.push(newVideo);
   res.status(201).send(newVideo);
 });
