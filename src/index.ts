@@ -58,6 +58,20 @@ app.post('/videos', (req: Request, res: Response) => {
     return;
   }
 
+  if (req.body.title.length > 40) {
+    res.sendStatus(400).json({
+      errorsMessages: [
+        {
+          message: 'Title should be less then 40 symbols',
+          field: 'title',
+        },
+      ],
+      resultCode: 1,
+    });
+
+    return;
+  }
+
   videos.push(newVideo);
   res.status(201).send(newVideo);
 });
@@ -105,12 +119,9 @@ app.put('/videos/:id', (req: Request, res: Response) => {
 app.delete('/videos/:id', (req: Request, res: Response) => {
   const index = videos.findIndex((v) => v.id.toString() === req.params.id);
 
-  if (index > 0) {
-    const newVideos = videos.filter((_, i) => index !== i);
-
-    console.log(newVideos);
-
-    res.status(204).send(newVideos);
+  if (index > -1) {
+    videos.splice(index, 1);
+    res.status(204).send(videos);
   } else {
     res.sendStatus(404);
   }
