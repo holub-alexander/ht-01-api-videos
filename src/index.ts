@@ -5,7 +5,7 @@ import { constants } from "http2";
 import { IVideo } from "./@types";
 
 export const app = express();
-const port = 5001;
+const port = 5000;
 
 // Middleware
 
@@ -125,7 +125,7 @@ app.delete("/videos/:id", (req: Request, res: Response) => {
   }
 });
 
-app.delete("/__test__/data", (_: Request, res: Response) => {
+app.delete("/testing/all-data", (_: Request, res: Response) => {
   videos = [];
   res.sendStatus(constants.HTTP_STATUS_NO_CONTENT);
 });
