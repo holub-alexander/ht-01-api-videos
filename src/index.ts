@@ -5,7 +5,7 @@ import { constants } from "http2";
 import { IVideo } from "./@types";
 
 export const app = express();
-const port = 5000;
+const port = 5002;
 
 // Middleware
 
@@ -13,11 +13,46 @@ app.use(cors());
 app.use(bodyParser.json());
 
 let videos: IVideo[] = [
-  { id: 1, title: "About JS - 01", author: "1.eu" },
-  { id: 2, title: "About JS - 02", author: "2.eu" },
-  { id: 3, title: "About JS - 03", author: "3.eu" },
-  { id: 4, title: "About JS - 04", author: "4.eu" },
-  { id: 5, title: "About JS - 05", author: "5.eu" },
+  {
+    id: 1,
+    title: "User 1",
+    author: "1.eu",
+    canBeDownloaded: true,
+    minAgeRestriction: null,
+    createdAt: "2022-12-18T12:42:19.528Z",
+    publicationDate: "2022-12-18T12:42:19.528Z",
+    availableResolutions: ["P144"],
+  },
+  {
+    id: 2,
+    title: "User 2",
+    author: "2.eu",
+    canBeDownloaded: true,
+    minAgeRestriction: null,
+    createdAt: "2022-12-18T12:42:19.528Z",
+    publicationDate: "2022-12-18T12:42:19.528Z",
+    availableResolutions: ["P144"],
+  },
+  {
+    id: 3,
+    title: "User 3",
+    author: "3.eu",
+    canBeDownloaded: true,
+    minAgeRestriction: null,
+    createdAt: "2022-12-18T12:42:19.528Z",
+    publicationDate: "2022-12-18T12:42:19.528Z",
+    availableResolutions: ["P144"],
+  },
+  {
+    id: 4,
+    title: "User 4",
+    author: "4.eu",
+    canBeDownloaded: true,
+    minAgeRestriction: null,
+    createdAt: "2022-12-18T12:42:19.528Z",
+    publicationDate: "2022-12-18T12:42:19.528Z",
+    availableResolutions: ["P144"],
+  },
 ];
 
 app.get("/", (_: Request, res: Response) => {
@@ -43,10 +78,15 @@ app.post("/videos", (req: Request, res: Response) => {
   const newVideo = {
     id: new Date().valueOf(),
     title: req.body.title,
-    author: "it-incubator.eu",
+    author: req.body.author,
+    availableResolutions: req.body.availableResolutions ?? null,
+    createdAt: new Date().toISOString(),
+    publicationDate: new Date().toISOString(),
+    canBeDownloaded: true,
+    minAgeRestriction: null,
   };
 
-  if (!req.body.title || !req.body.title.trim("")) {
+  if (!req.body.title?.trim("")) {
     res.status(400).send({
       errorsMessages: [
         {
@@ -59,12 +99,38 @@ app.post("/videos", (req: Request, res: Response) => {
     return;
   }
 
-  if (req.body.title.length > 40) {
+  if (req.body.title?.length > 40) {
     res.status(400).send({
       errorsMessages: [
         {
           message: "Title should be less then 40 symbols",
           field: "title",
+        },
+      ],
+    });
+
+    return;
+  }
+
+  if (!req.body.author?.trim("")) {
+    res.status(400).send({
+      errorsMessages: [
+        {
+          message: "Author is required",
+          field: "author",
+        },
+      ],
+    });
+
+    return;
+  }
+
+  if (req.body.author?.length > 20) {
+    res.status(400).send({
+      errorsMessages: [
+        {
+          message: "Author should be less then 20 symbols",
+          field: "author",
         },
       ],
     });
