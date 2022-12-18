@@ -45,11 +45,66 @@ let videos: IVideo[] = [
   },
 ];
 
+const availableResolutions = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"];
+
 const getErrorsMessages = (arr: { message: string; field: string }[], field: string, message: string) => {
   arr.push({
     message,
     field,
   });
+};
+
+const requestBodyValidation = (req: Request, errors: any) => {
+  try {
+    if (!req.body.title?.trim("")) {
+      getErrorsMessages(errors.errorsMessages, "title", "Title is required");
+    }
+
+    if (req.body.title?.length > 40) {
+      getErrorsMessages(errors.errorsMessages, "title", "Title should be less then 40 symbols");
+    }
+
+    if (!req.body.author?.trim("")) {
+      getErrorsMessages(errors.errorsMessages, "author", "Author is required");
+    }
+
+    if (req.body.author?.length > 20) {
+      getErrorsMessages(errors.errorsMessages, "author", "Author should be less then 40 symbols");
+    }
+
+    if (req.body.availableResolutions) {
+      if (typeof req.body.availableResolutions !== "object") {
+        getErrorsMessages(
+          errors.errorsMessages,
+          "availableResolutions",
+          "The availableResolutions field must contain a array values"
+        );
+      }
+
+      console.log(
+        "name",
+        req.body.availableResolutions.every((v: any) => availableResolutions.includes(v))
+      );
+
+      if (req.body.availableResolutions.every((v: any) => !availableResolutions.includes(v))) {
+        getErrorsMessages(
+          errors.errorsMessages,
+          "availableResolutions",
+          "The given availableResolutions does not exist"
+        );
+      }
+    }
+
+    if (req.body.canBeDownloaded && typeof req.body.canBeDownloaded !== "boolean") {
+      getErrorsMessages(
+        errors.errorsMessages,
+        "canBeDownloaded",
+        "The canBeDownloaded field must contain a boolean value"
+      );
+    }
+  } catch (err) {
+    console.log("err", err);
+  }
 };
 
 app.get("/", (_: Request, res: Response) => {
@@ -85,21 +140,7 @@ app.post("/videos", (req: Request, res: Response) => {
     minAgeRestriction: null,
   };
 
-  if (!req.body.title?.trim("")) {
-    getErrorsMessages(errors.errorsMessages, "title", "Title is required");
-  }
-
-  if (req.body.title?.length > 40) {
-    getErrorsMessages(errors.errorsMessages, "title", "Title should be less then 40 symbols");
-  }
-
-  if (!req.body.author?.trim("")) {
-    getErrorsMessages(errors.errorsMessages, "author", "Author is required");
-  }
-
-  if (req.body.author?.length > 20) {
-    getErrorsMessages(errors.errorsMessages, "author", "Author should be less then 20 symbols");
-  }
+  requestBodyValidation(req, errors);
 
   if (errors.errorsMessages.length > 0) {
     res.status(400).send(errors);
@@ -114,21 +155,7 @@ app.put("/videos/:id", (req: Request, res: Response) => {
   const errors = { errorsMessages: [] };
   const video = videos.find((v) => v.id.toString() === req.params.id);
 
-  if (!req.body.title?.trim("")) {
-    getErrorsMessages(errors.errorsMessages, "title", "Title is required");
-  }
-
-  if (req.body.title?.length > 40) {
-    getErrorsMessages(errors.errorsMessages, "title", "Title should be less then 40 symbols");
-  }
-
-  if (!req.body.author?.trim("")) {
-    getErrorsMessages(errors.errorsMessages, "author", "Author is required");
-  }
-
-  if (req.body.author?.length > 20) {
-    getErrorsMessages(errors.errorsMessages, "author", "Author should be less then 40 symbols");
-  }
+  requestBodyValidation(req, errors);
 
   if (errors.errorsMessages.length > 0) {
     res.status(400).send(errors);

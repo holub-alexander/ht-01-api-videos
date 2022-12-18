@@ -58,7 +58,10 @@ describe("/videos", () => {
   it("shouldn't update video with incorrect input data", async () => {
     await request(app)
       .put(`/videos/${createdVideo.id}`)
-      .send({})
+      .send({
+        availableResolutions: ["string"],
+        canBeDownloaded: "string",
+      })
       .expect(constants.HTTP_STATUS_BAD_REQUEST, {
         errorsMessages: [
           {
@@ -68,6 +71,14 @@ describe("/videos", () => {
           {
             message: "Author is required",
             field: "author",
+          },
+          {
+            message: "The given availableResolutions does not exist",
+            field: "availableResolutions",
+          },
+          {
+            message: "The canBeDownloaded field must contain a boolean value",
+            field: "canBeDownloaded",
           },
         ],
       });
