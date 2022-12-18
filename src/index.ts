@@ -72,6 +72,8 @@ app.get("/videos/:videoId", (req: Request, res: Response) => {
 });
 
 app.post("/videos", (req: Request, res: Response) => {
+  const errors = { errorsMessages: [] };
+
   const newVideo = {
     id: new Date().valueOf(),
     title: req.body.title,
@@ -84,54 +86,23 @@ app.post("/videos", (req: Request, res: Response) => {
   };
 
   if (!req.body.title?.trim("")) {
-    res.status(400).send({
-      errorsMessages: [
-        {
-          message: "Title is required",
-          field: "title",
-        },
-      ],
-    });
-
-    return;
+    getErrorsMessages(errors.errorsMessages, "title", "Title is required");
   }
 
   if (req.body.title?.length > 40) {
-    res.status(400).send({
-      errorsMessages: [
-        {
-          message: "Title should be less then 40 symbols",
-          field: "title",
-        },
-      ],
-    });
-
-    return;
+    getErrorsMessages(errors.errorsMessages, "title", "Title should be less then 40 symbols");
   }
 
   if (!req.body.author?.trim("")) {
-    res.status(400).send({
-      errorsMessages: [
-        {
-          message: "Author is required",
-          field: "author",
-        },
-      ],
-    });
-
-    return;
+    getErrorsMessages(errors.errorsMessages, "author", "Author is required");
   }
 
   if (req.body.author?.length > 20) {
-    res.status(400).send({
-      errorsMessages: [
-        {
-          message: "Author should be less then 20 symbols",
-          field: "author",
-        },
-      ],
-    });
+    getErrorsMessages(errors.errorsMessages, "author", "Author should be less then 20 symbols");
+  }
 
+  if (errors.errorsMessages.length > 0) {
+    res.status(400).send(errors);
     return;
   }
 
