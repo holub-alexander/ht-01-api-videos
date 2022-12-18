@@ -81,12 +81,7 @@ const requestBodyValidation = (req: Request, errors: any) => {
         );
       }
 
-      console.log(
-        "name",
-        req.body.availableResolutions.every((v: any) => availableResolutions.includes(v))
-      );
-
-      if (req.body.availableResolutions.every((v: any) => !availableResolutions.includes(v))) {
+      if (!req.body.availableResolutions.every((v: any) => availableResolutions.includes(v))) {
         getErrorsMessages(
           errors.errorsMessages,
           "availableResolutions",
@@ -101,6 +96,24 @@ const requestBodyValidation = (req: Request, errors: any) => {
         "canBeDownloaded",
         "The canBeDownloaded field must contain a boolean value"
       );
+    }
+
+    if (typeof req.body.minAgeRestriction === "number") {
+      if (req.body.minAgeRestriction < 1) {
+        getErrorsMessages(
+          errors.errorsMessages,
+          "minAgeRestriction",
+          "The minAgeRestriction field cannot be less than 1"
+        );
+      }
+
+      if (req.body.minAgeRestriction > 18) {
+        getErrorsMessages(
+          errors.errorsMessages,
+          "minAgeRestriction",
+          "The minAgeRestriction field cannot be greater than 18"
+        );
+      }
     }
   } catch (err) {
     console.log("err", err);
@@ -165,10 +178,13 @@ app.put("/videos/:id", (req: Request, res: Response) => {
   if (video) {
     video.title = req.body.title;
     video.author = req.body.author;
-    video.canBeDownloaded = req.body.canBeDownloaded ?? false;
     video.availableResolutions = req.body.availableResolutions ?? null;
     video.minAgeRestriction = req.body.minAgeRestriction ?? null;
-    video.publicationDate = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString();
+    video.publicationDate = req.body.minAgeRestriction;
+
+    if (req.body.canBeDownloaded) {
+      video.canBeDownloaded = req.body.canBeDownloaded;
+    }
 
     res.status(204).send(videos);
   } else {
