@@ -45,7 +45,7 @@ describe("/videos", () => {
       id: expect.any(Number),
       title: "Video title",
       author: "it-incubator.eu",
-      canBeDownloaded: true,
+      canBeDownloaded: false,
       minAgeRestriction: null,
       createdAt: expect.any(String),
       publicationDate: expect.any(String),
@@ -55,23 +55,25 @@ describe("/videos", () => {
     await request(app).get("/videos").expect(constants.HTTP_STATUS_OK, [createdVideo]);
   });
 
-  // it("shouldn't update video with incorrect input data", async () => {
-  //   await request(app)
-  //     .put(`/videos/${createdVideo.id}`)
-  //     .send({
-  //       title: "",
-  //     })
-  //     .expect(constants.HTTP_STATUS_BAD_REQUEST, {
-  //       errorsMessages: [
-  //         {
-  //           message: "Title is required",
-  //           field: "title",
-  //         },
-  //       ],
-  //     });
-  //
-  //   await request(app).get(`/videos`).expect(constants.HTTP_STATUS_OK, [createdVideo]);
-  // });
+  it("shouldn't update video with incorrect input data", async () => {
+    await request(app)
+      .put(`/videos/${createdVideo.id}`)
+      .send({})
+      .expect(constants.HTTP_STATUS_BAD_REQUEST, {
+        errorsMessages: [
+          {
+            message: "Title is required",
+            field: "title",
+          },
+          {
+            message: "Author is required",
+            field: "author",
+          },
+        ],
+      });
+
+    await request(app).get(`/videos`).expect(constants.HTTP_STATUS_OK, [createdVideo]);
+  });
   //
   // it("should update video with correct input data", async () => {
   //   await request(app)

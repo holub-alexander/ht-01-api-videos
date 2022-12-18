@@ -17,7 +17,7 @@ let videos: IVideo[] = [
     id: 1,
     title: "User 1",
     author: "1.eu",
-    canBeDownloaded: true,
+    canBeDownloaded: false,
     minAgeRestriction: null,
     createdAt: "2022-12-18T12:42:19.528Z",
     publicationDate: "2022-12-18T12:42:19.528Z",
@@ -27,7 +27,7 @@ let videos: IVideo[] = [
     id: 2,
     title: "User 2",
     author: "2.eu",
-    canBeDownloaded: true,
+    canBeDownloaded: false,
     minAgeRestriction: null,
     createdAt: "2022-12-18T12:42:19.528Z",
     publicationDate: "2022-12-18T12:42:19.528Z",
@@ -37,23 +37,20 @@ let videos: IVideo[] = [
     id: 3,
     title: "User 3",
     author: "3.eu",
-    canBeDownloaded: true,
-    minAgeRestriction: null,
-    createdAt: "2022-12-18T12:42:19.528Z",
-    publicationDate: "2022-12-18T12:42:19.528Z",
-    availableResolutions: ["P144"],
-  },
-  {
-    id: 4,
-    title: "User 4",
-    author: "4.eu",
-    canBeDownloaded: true,
+    canBeDownloaded: false,
     minAgeRestriction: null,
     createdAt: "2022-12-18T12:42:19.528Z",
     publicationDate: "2022-12-18T12:42:19.528Z",
     availableResolutions: ["P144"],
   },
 ];
+
+const getErrorsMessages = (arr: { message: string; field: string }[], field: string, message: string) => {
+  arr.push({
+    message,
+    field,
+  });
+};
 
 app.get("/", (_: Request, res: Response) => {
   res.send("Hello World!");
@@ -143,36 +140,37 @@ app.post("/videos", (req: Request, res: Response) => {
 });
 
 app.put("/videos/:id", (req: Request, res: Response) => {
+  const errors = { errorsMessages: [] };
   const video = videos.find((v) => v.id.toString() === req.params.id);
 
-  if (!req.body.title || !req.body.title.trim("")) {
-    res.status(400).send({
-      errorsMessages: [
-        {
-          message: "Title is required",
-          field: "title",
-        },
-      ],
-    });
-
-    return;
+  if (!req.body.title?.trim("")) {
+    getErrorsMessages(errors.errorsMessages, "title", "Title is required");
   }
 
-  if (req.body.title.length > 40) {
-    res.status(400).send({
-      errorsMessages: [
-        {
-          message: "Title should be less then 40 symbols",
-          field: "title",
-        },
-      ],
-    });
+  if (req.body.title?.length > 40) {
+    getErrorsMessages(errors.errorsMessages, "title", "Title should be less then 40 symbols");
+  }
 
+  if (!req.body.author?.trim("")) {
+    getErrorsMessages(errors.errorsMessages, "author", "Author is required");
+  }
+
+  if (req.body.author?.length > 20) {
+    getErrorsMessages(errors.errorsMessages, "author", "Author should be less then 40 symbols");
+  }
+
+  if (errors.errorsMessages.length > 0) {
+    res.status(400).send(errors);
     return;
   }
 
   if (video) {
     video.title = req.body.title;
+    video.author = req.body.author;
+    video.canBeDownloaded = req.body.canBeDownloaded ?? false;
+    video.availableResolutions = req.body.availableResolutions ?? null;
+    video.minAgeRestriction = req.body.minAgeRestriction ?? null;
+    video.publicationDate = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString();
 
     res.status(204).send(videos);
   } else {
