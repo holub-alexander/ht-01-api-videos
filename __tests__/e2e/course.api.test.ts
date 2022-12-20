@@ -36,10 +36,12 @@ describe("/videos", () => {
   it("should create video with correct input data", async () => {
     const createResponse = await request(app)
       .post("/videos")
-      .send({ title: "Video title", author: "it-incubator.eu", availableResolutions: ["P144", "P143"] })
+      .send({ title: "Video title", author: "it-incubator.eu", availableResolutions: ["P144"] })
       .expect(constants.HTTP_STATUS_CREATED);
 
     createdVideo = createResponse.body;
+
+    console.log(createdVideo);
 
     expect(createdVideo).toEqual({
       id: expect.any(Number),
@@ -49,7 +51,7 @@ describe("/videos", () => {
       minAgeRestriction: null,
       createdAt: expect.any(String),
       publicationDate: expect.any(String),
-      availableResolutions: ["P144", "P143"],
+      availableResolutions: ["P144"],
     });
 
     await request(app).get("/videos").expect(constants.HTTP_STATUS_OK, [createdVideo]);
@@ -85,19 +87,31 @@ describe("/videos", () => {
 
     await request(app).get(`/videos`).expect(constants.HTTP_STATUS_OK, [createdVideo]);
   });
-  //
-  // it("should update video with correct input data", async () => {
-  //   await request(app)
-  //     .put(`/videos/${createdVideo.id}`)
-  //     .send({
-  //       title: "Video title update",
-  //     })
-  //     .expect(constants.HTTP_STATUS_NO_CONTENT);
-  //
-  //   await request(app)
-  //     .get(`/videos/${createdVideo.id}`)
-  //     .expect(constants.HTTP_STATUS_OK, { ...createdVideo, title: "Video title update" });
-  // });
+
+  it("should update video with correct input data", async () => {
+    await request(app)
+      .put(`/videos/${createdVideo.id}`)
+      .send({
+        author: "length_21-weqweq",
+        title: "valid title",
+        availableResolutions: ["P240", "P720"],
+        canBeDownloaded: true,
+        minAgeRestriction: 15,
+      })
+      .expect(constants.HTTP_STATUS_NO_CONTENT);
+
+    const updatedVideo = await request(app).get(`/videos/${createdVideo.id}`).expect(constants.HTTP_STATUS_OK);
+
+    expect(updatedVideo.body).toEqual({
+      ...createdVideo,
+      author: "length_21-weqweq",
+      title: "valid title",
+      availableResolutions: ["P240", "P720"],
+      canBeDownloaded: true,
+      minAgeRestriction: 15,
+      publicationDate: expect.any(String),
+    });
+  });
 
   it("should delete video", async () => {
     await request(app).delete(`/videos/${createdVideo.id}`).expect(constants.HTTP_STATUS_NO_CONTENT);

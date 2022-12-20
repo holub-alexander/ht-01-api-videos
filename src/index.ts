@@ -69,7 +69,11 @@ const requestBodyValidation = (req: Request, errors: any) => {
     }
 
     if (req.body.author?.length > 20) {
-      getErrorsMessages(errors.errorsMessages, "author", "Author should be less then 40 symbols");
+      getErrorsMessages(errors.errorsMessages, "author", "Author field cannot be more than 20 characters");
+    }
+
+    if (req.body.publicationDate && typeof req.body.publicationDate !== "string") {
+      getErrorsMessages(errors.errorsMessages, "publicationDate", "The publicationDate field must be a string");
     }
 
     if (req.body.availableResolutions) {
@@ -168,6 +172,8 @@ app.put("/videos/:id", (req: Request, res: Response) => {
   const errors = { errorsMessages: [] };
   const video = videos.find((v) => v.id.toString() === req.params.id);
 
+  const newPublicationDate = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString();
+
   requestBodyValidation(req, errors);
 
   if (errors.errorsMessages.length > 0) {
@@ -180,7 +186,7 @@ app.put("/videos/:id", (req: Request, res: Response) => {
     video.author = req.body.author;
     video.availableResolutions = req.body.availableResolutions ?? null;
     video.minAgeRestriction = req.body.minAgeRestriction ?? null;
-    video.publicationDate = req.body.minAgeRestriction;
+    video.publicationDate = req.body.publicationDate ?? newPublicationDate;
 
     if (req.body.canBeDownloaded) {
       video.canBeDownloaded = req.body.canBeDownloaded;
